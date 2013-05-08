@@ -1,74 +1,75 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using CollectdClient.Core.Extensions;
 using CollectdClient.Core.Plugins;
-using System;
 using System.Threading;
 using System.Diagnostics;
-using System.Linq;
 
 namespace CollectdClient.Core
 {
     public class PluginRunner
     {
-        private readonly IEnumerable<IPlugin> plugins;
+        private readonly IPluginRepository repository;
 
         public PluginRunner(IPluginRepository repository)
         {
-            this.plugins = repository.GetCurrentPlugins();
+            this.repository = repository;
         }
 
         private CancellationTokenSource cts = new CancellationTokenSource();
 
-        public void Run()
+        public Task Run()
         {
             var tasks = new List<Task>();
 
-            foreach (var plugin in plugins.OfType<IReadInterface>())
+            var runners = new List<ReadInterfaceRunner>();
+            foreach (var plugin in repository.GetReadPlugins())
             {
-                var runner = new ReadInterfaceRunner(plugin, cts.Token);
-                tasks.Add(runner.Run());
+                var pluginInstance = repository.GetPluginInstance(plugin);
+                var runner = new ReadInterfaceRunner(pluginInstance, cts.Token);
+                runners.Add(runner);
             }
 
-            Task.WaitAll(tasks.ToArray());
+            return Task.WhenAll(runners.Select(x => x.Run()));
         }
 
 
         private class ReadInterfaceRunner
         {
             private readonly IReadInterface plugin;
+            private readonly int interval;
             private readonly CancellationToken token;
-            private Timer timer;
 
-            public ReadInterfaceRunner(IReadInterface plugin, CancellationToken token)
+            public ReadInterfaceRunner(PluginInstance pluginInstance, CancellationToken token)
             {
-                this.plugin = plugin;
+                this.plugin = (IReadInterface)pluginInstance.Plugin;
+                this.interval = pluginInstance.Metadata.Interval * 1000;
                 this.token = token;
             }
 
             public Task Run()
             {
-                return Task.Factory.StartNew(() =>
-                {
-                    //ctx.Init();
-                    while (!token.IsCancellationRequested)
-                    {
-                        var sw = new Stopwatch();
-                        sw.Start();
-                        plugin.Read();
-                        sw.Stop();
-
-                        Console.WriteLine(string.Format("Skew: {0}", sw.ElapsedMilliseconds));
-
-                        var toSleep = 10000 - sw.ElapsedMilliseconds;
-
-                        if (toSleep > 0)
-                            Thread.Sleep((int)toSleep);
-                    }
-                }, TaskCreationOptions.LongRunning);
+                return Task.Factory.StartNew(() => RunAsync());
             }
 
+            public async Task RunAsync()
+            {
+                while (!token.IsCancellationRequested)
+                {
+                    var sw = new Stopwatch();
+                    sw.Start();
+                    await plugin.Read();
+                    sw.Stop();
+                    
+                    Console.WriteLine(string.Format("running {0} on thread {1}", plugin, System.Threading.Thread.CurrentThread.ManagedThreadId));
+                    var toSleep = interval - sw.ElapsedMilliseconds;
 
-
+                    if (toSleep > 0)
+                        Thread.Sleep((int)toSleep);
+                }
+            }
         }
     }
 }

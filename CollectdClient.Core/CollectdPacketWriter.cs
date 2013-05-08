@@ -31,7 +31,7 @@ namespace CollectdClient.Core
             }
         }
 
-        public void Write(PluginData data)
+        public void Write(ValueList data)
         {
             WriteString(Protocol.TypeHost, data.Host);
             WriteNumber(Protocol.TypeTime, (uint)(data.Time / 1000));
@@ -40,15 +40,10 @@ namespace CollectdClient.Core
             WriteString(Protocol.TypeType, data.Type);
             WriteString(Protocol.TypeTypeInstance, data.TypeInstance);
 
-            var vl = (ValueList)data;
-            if (vl != null)
-            {
-                List<DataSource> ds = TypesDB.Instance.GetType(data.Type);
-                var values = vl.Values;
+            List<DataSource> ds = TypesDB.Instance.GetType(data.Type);
 
-                WriteNumber(Protocol.TypeInterval, vl.Interval);
-                WriteValues(ds, values);
-            }
+            WriteNumber(Protocol.TypeInterval, data.Interval);
+            WriteValues(ds, data.Values);
         }
 
         private void WriteValues(List<DataSource> ds, IList<double> values)
@@ -144,7 +139,7 @@ namespace CollectdClient.Core
             }
         }
 
-        internal void Reset()
+        public void Reset()
         {
             stream.Close();
             stream = new MemoryStream();

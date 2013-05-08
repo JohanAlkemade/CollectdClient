@@ -1,15 +1,10 @@
-﻿var bla = {
+﻿{
     "EnabledPlugins": [
-	    "LogFile", "Redis"
+	    "redis", "cpu", "interface", "network"
     ],
 
     "Plugins":
     {
-        "LogFile": {
-            "LogLevel": "INFO",
-            "File": "c:\out.txt",
-            "TimeStamp": true
-        },
         "WriteGraphite": {
             "Carbon": {
                 "Host": "localhost",
@@ -17,17 +12,24 @@
                 "Prefix": "collectd"
             }
         },
-        "Redis": {
+        "redis": {
             "redis01": {
-                "Host": "redis01.alkmaar.zibernet.eu",
+                "Host": "172.16.20.139",
                 "Port": 6379,
                 "Timeout": 2000
             },
             "redis02": {
-                "Host": "redis02.alkmaar.zibernet.eu",
+                "Host": "172.16.20.140",
                 "Port": 6379,
                 "Timeout": 2000
             }
+        },
+		"network": {
+			"server" : "10.201.0.248"
+		},
+        "interface" : {
+            "include": [],
+			"exclude" : []
         }
     }
 }

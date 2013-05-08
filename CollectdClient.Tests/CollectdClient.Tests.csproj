@@ -56,14 +56,18 @@
   <ItemGroup>
     <Compile Include="DataSetTests.cs" />
     <Compile Include="DataSourceTests.cs" />
-    <Compile Include="UdpDispatchTests.cs" />
     <Compile Include="PluginRunnerTests.cs" />
+    <Compile Include="Plugins\ComposablePluginRepositoryFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CollectdClient.Core\CollectdClient.Core.csproj">
       <Project>{A5A36CD1-B7C9-42F4-A12F-93B38EC28433}</Project>
       <Name>CollectdClient.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CollectdClient.Plugins\CollectdClient.Plugins.csproj">
+      <Project>{857bef43-8743-437f-9ef5-30f236c7fec7}</Project>
+      <Name>CollectdClient.Plugins</Name>
     </ProjectReference>
     <ProjectReference Include="..\CollectdClient\CollectdClient.csproj">
       <Project>{1e7b1952-c0fe-4b35-b084-a58c264f66dd}</Project>

@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading.Tasks;
+using CollectdClient.Core;
+using CollectdClient.Core.Plugins;
 
-namespace CollectdClient.Core.Plugins
+namespace CollectdClient.Plugins
 {
     [Plugin("cpu")]
     public class CpuPlugin : IReadInterface, IInitInterface, IShutdownInterface
@@ -56,9 +59,9 @@ namespace CollectdClient.Core.Plugins
         {
         }
 
-        public bool Read()
+        public Task<bool> Read()
         {
-            return CpuRead();
+            return Task.FromResult(CpuRead());
         }
 
         public bool Init()

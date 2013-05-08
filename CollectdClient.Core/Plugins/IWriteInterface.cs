@@ -1,11 +1,16 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace CollectdClient.Core.Plugins
 {
-    public interface IWriteInterface : IPlugin
+    public interface  IBatchedWriteInterface : IWriteInterface
     {
         int BatchSize { get; }
-        bool WriteBatch(ValueList[] vl);
-        bool Write(ValueList vl);
+        Task<bool> WriteBatch(ValueList[] vl);
+    }
+
+    public interface IWriteInterface : IPlugin
+    {
+        Task<bool> Write(ValueList vl);
     }
 }

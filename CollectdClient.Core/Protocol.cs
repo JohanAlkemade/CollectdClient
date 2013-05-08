@@ -1,6 +1,6 @@
 ﻿namespace CollectdClient.Core
 {
-    internal static class Protocol
+    public static class Protocol
     {
         internal const int TypeHost = 0x0000;
         internal const int TypeTime = 0x0001;
@@ -21,6 +21,6 @@
         internal const int UInt64Len = UInt32Len * 2;
         internal const int HeaderLen = UInt16Len * 2;
                        
-        internal const int BufferSize = 1024;
+        public const int BufferSize = 1024;
     }
 }

@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using CollectdClient.Core.Plugins;
 
 namespace CollectdClient.Core
 {
     public static class PluginRepositoryExtensions
     {
-
         public static IEnumerable<IReadInterface> GetReadPlugins(this IPluginRepository repository)
         {
             return repository.GetCurrentPlugins().OfType<IReadInterface>();
@@ -24,10 +20,15 @@ namespace CollectdClient.Core
         {
             return repository.GetCurrentPlugins().OfType<IInitInterface>();
         }
-        
+
         public static IEnumerable<IShutdownInterface> GetShutdownPlugins(this IPluginRepository repository)
         {
             return repository.GetCurrentPlugins().OfType<IShutdownInterface>();
+        }
+
+        public static IEnumerable<IConfigInterface> GetConfigPlugins(this IPluginRepository repository)
+        {
+            return repository.GetCurrentPlugins().OfType<IConfigInterface>();
         }
     }
 }

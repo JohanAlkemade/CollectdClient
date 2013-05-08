@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using CollectdClient.Core;
 using CollectdClient.Core.Plugins;
+using CollectdClient.Plugins;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CollectdClient.Tests

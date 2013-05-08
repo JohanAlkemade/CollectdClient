@@ -7,10 +7,14 @@ namespace CollectdClient.Core.Plugins
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     public class PluginAttribute : ExportAttribute, IPluginMetadata
     {
-        public PluginAttribute(string name) : base(typeof(IPlugin))
+        public PluginAttribute(string name) : this(name, 10)
+        {
+        }
+
+        public PluginAttribute(string name, int interval) : base(typeof (IPlugin))
         {
             this.Name = name;
-            this.Interval = 10;
+            this.Interval = interval;
         }
 
         public string Name { get; private set; }

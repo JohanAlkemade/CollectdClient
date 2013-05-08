@@ -33,6 +33,9 @@
     <Reference Include="Common.Logging">
       <HintPath>..\packages\Common.Logging.2.1.2\lib\net40\Common.Logging.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.5.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
@@ -51,22 +54,22 @@
     <Compile Include="CollectdPacketWriter.cs" />
     <Compile Include="CollectdPipeline.cs" />
     <Compile Include="ComposablePluginRepository.cs" />
-    <Compile Include="EnumerableExtensions.cs" />
+    <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="IPluginRepository.cs" />
     <Compile Include="Logging\CollectdLogger.cs" />
     <Compile Include="Logging\CollectdLoggerFactoryAdapter.cs" />
-    <Compile Include="PluginRepositoryExtensions.cs" />
+    <Compile Include="Extensions\PluginRepositoryExtensions.cs" />
+    <Compile Include="PluginInstance.cs" />
     <Compile Include="PluginRunner.cs" />
     <Compile Include="DataSet.cs" />
     <Compile Include="DataSource.cs" />
-    <Compile Include="IDispatcher.cs" />
     <Compile Include="Misc\BigEndianBitConverter.cs" />
     <Compile Include="Misc\DoubleConverter.cs" />
     <Compile Include="Misc\EndianBitConverter.cs" />
     <Compile Include="Misc\Endianness.cs" />
     <Compile Include="Misc\LittleEndianBitConverter.cs" />
     <Compile Include="PluginData.cs" />
-    <Compile Include="Plugins\CpuPlugin.cs" />
+    <Compile Include="Plugins\IConfigInterface.cs" />
     <Compile Include="Plugins\IInitInterface.cs" />
     <Compile Include="Plugins\IPlugin.cs" />
     <Compile Include="Plugins\IPluginMetadata.cs" />
@@ -75,16 +78,10 @@
     <Compile Include="Plugins\IWriteInterface.cs" />
     <Compile Include="Plugins\PluginAttribute.cs" />
     <Compile Include="Plugins\PluginContext.cs" />
-    <Compile Include="Plugins\TestWritePlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Protocol.cs" />
-    <Compile Include="Sender.cs" />
     <Compile Include="TypesDB.cs" />
-    <Compile Include="UdpDispatcher.cs" />
     <Compile Include="ValueList.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Config\config.js" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
