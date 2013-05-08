@@ -41,7 +41,17 @@ namespace CollectdClient.Plugins
             }
         }
 
-        public async Task<bool> Write(ValueList vl)
+        public async Task<bool> Write(ValueList[] vl)
+        {
+            for (int i = 0; i < vl.Length; i++)
+            {
+                await WriteSingle(vl[i]);
+            } 
+
+            return true;
+        }
+
+        private async Task WriteSingle(ValueList vl)
         {
             int len = writer.Size;
             writer.Write(vl);
@@ -53,9 +63,6 @@ namespace CollectdClient.Plugins
                 writer.Reset();
                 writer.Write(vl);
             }
-
-            return true;
         }
-
     }
 }

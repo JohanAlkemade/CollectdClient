@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Threading.Tasks;
 using CollectdClient.Core;
+using CollectdClient.Core.Extensions;
 using CollectdClient.Core.Plugins;
 
 namespace CollectdClient.Plugins
@@ -100,6 +101,13 @@ namespace CollectdClient.Plugins
                 counters.Add(idleCounter);
                 counters.Add(interruptCounter);
             }
+
+            //these counters can return 0 as the first value
+            foreach (var counter in counters)
+            {
+                counter.NextValue();
+            }
+            
             return true;
         }
 

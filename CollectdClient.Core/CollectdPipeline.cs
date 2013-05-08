@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using CollectdClient.Core.Plugins;
 
@@ -16,29 +17,14 @@ namespace CollectdClient.Core
 
         public void RegisterWriter(IWriteInterface writer)
         {
-            broadcast.LinkTo(new ActionBlock<ValueList>(vl =>
-                {
-                    return writer.Write(vl);
-                }), new DataflowLinkOptions() { PropagateCompletion = true });
-        }
+            var batchBlock = new BatchBlock<ValueList>(int.MaxValue);
+            
+            var timer = new Timer(state => batchBlock.TriggerBatch());
+            timer.Change(0, 10000);
 
-        public void RegisterWriter(IBatchedWriteInterface writer)
-        {
-            //if the plugin uses a batched approach, add a batchblock between 
-            //the broadcast and the action blocks
-            if (writer.BatchSize > 1)
-            {
-                var bufferBlock = new BatchBlock<ValueList>(writer.BatchSize);
-                bufferBlock.LinkTo(new ActionBlock<ValueList[]>(vls => writer.WriteBatch(vls)),
-                                   new DataflowLinkOptions() {PropagateCompletion = true});
+            broadcast.LinkTo(batchBlock);
 
-                broadcast.LinkTo(bufferBlock, new DataflowLinkOptions() {PropagateCompletion = true});
-            }
-            else
-            {
-                
-                broadcast.LinkTo(new ActionBlock<ValueList>(vl => writer.Write(vl)), new DataflowLinkOptions() { PropagateCompletion = true });
-            }
+            batchBlock.LinkTo(new ActionBlock<ValueList[]>(vl => writer.Write(vl)));
         }
 
         public void Complete()
