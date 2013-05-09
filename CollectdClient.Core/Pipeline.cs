@@ -5,17 +5,15 @@ using CollectdClient.Core.Plugins;
 
 namespace CollectdClient.Core
 {
-    public class CollectdPipeline
+    public class Pipeline
     {
-        public IPluginRepository Repository { get; set; }
-
         private readonly BroadcastBlock<ValueList> broadcast = new BroadcastBlock<ValueList>(x => x);
 
-        public CollectdPipeline()
+        public Pipeline()
         {
         }
 
-        public void RegisterWriter(IWriteInterface writer)
+        public void AddWriter(IWriteInterface writer)
         {
             var batchBlock = new BatchBlock<ValueList>(int.MaxValue);
             
@@ -33,7 +31,7 @@ namespace CollectdClient.Core
             broadcast.Completion.Wait();
         }
 
-        public void Post(ValueList vl)
+        public void Process(ValueList vl)
         {
             broadcast.Post(vl);
         }

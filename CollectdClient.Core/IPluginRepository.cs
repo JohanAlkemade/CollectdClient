@@ -7,7 +7,9 @@ namespace CollectdClient.Core
     {
         bool Exists(string pluginName);
 
-        void EnablePlugin(string pluginName);
+        void EnablePlugin(IPlugin plugin);
+        void DisablePlugin(IPlugin plugin);
+
         IPlugin GetPlugin(string pluginName);
         PluginInstance GetPluginInstance(IPlugin plugin);
 

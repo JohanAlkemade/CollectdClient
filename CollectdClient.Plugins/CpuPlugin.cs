@@ -65,7 +65,7 @@ namespace CollectdClient.Plugins
             return Task.FromResult(CpuRead());
         }
 
-        public bool Init()
+        public void Init()
         {
             int numberOfProcessors = System.Environment.ProcessorCount;
 
@@ -106,9 +106,7 @@ namespace CollectdClient.Plugins
             foreach (var counter in counters)
             {
                 counter.NextValue();
-            }
-            
-            return true;
+            }            
         }
 
         public bool Shutdown()

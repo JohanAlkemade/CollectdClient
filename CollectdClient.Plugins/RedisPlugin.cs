@@ -4,6 +4,7 @@ using BookSleeve;
 using CollectdClient.Core;
 using CollectdClient.Core.Plugins;
 using Newtonsoft.Json.Linq;
+using System;
 
 namespace CollectdClient.Plugins
 {
@@ -22,13 +23,21 @@ namespace CollectdClient.Plugins
         {
         }
 
-        public bool Init()
+        public void Init()
         {
-            foreach (var con in connections.Values)
+            try
             {
-                con.Open();
+
+                foreach (var con in connections.Values)
+                {
+                    var openTask = con.Open();
+                    con.Wait(openTask);
+                }
             }
-            return true;
+            catch (Exception e)
+            {
+                throw new PluginException(e);
+            }
         }
 
         public void Config(JToken config)

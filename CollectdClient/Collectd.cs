@@ -10,26 +10,31 @@ namespace CollectdClient
 {
     public class Collectd
     {
-        [Import(typeof(IPluginRepository))]
-        public IPluginRepository Repository { get; set; }
-
+        private IPluginRepository repository;
         private readonly JObject config;
+        private readonly PluginManager manager;
 
-        public Collectd(JObject config)
+        public Collectd(JObject config, IPluginRepository repository)
         {
             this.config = config;
+            this.repository = repository;
+            this.manager = new PluginManager(repository);
         }
 
         private void Configure()
         {
             var enabledPlugins = config["EnabledPlugins"];
-            enabledPlugins.ForEach(x => Repository.EnablePlugin(x.Value<string>()));
+            foreach (string enabledPlugin in enabledPlugins)
+            {
+                var plugin = repository.GetPlugin(enabledPlugin);
+                repository.EnablePlugin(plugin);
+            }
 
             var pluginsObj = config["Plugins"];
             //for each enabled plugin
-            foreach (var plugin in Repository.GetConfigPlugins())
+            foreach (var plugin in repository.GetConfigPlugins())
             {
-                string pluginName = Repository.GetPluginName(plugin);
+                string pluginName = repository.GetPluginName(plugin);
                 var configPart = pluginsObj[pluginName];
                 plugin.Config(configPart);
             }
@@ -39,42 +44,19 @@ namespace CollectdClient
         {
             Configure();
 
-            foreach (var writer in Repository.GetWritePlugins())
-            {
-                CollectdClient.Core.Collectd.Pipeline.RegisterWriter(writer);
-            }
+            manager.Init();
         }
 
         public void RunLoops()
         {
-            var runner = new PluginRunner(Repository);
+            var runner = new PluginRunner(repository);
             var task = runner.Run();
             task.Wait();
         }
 
         public void Shutdown()
         {
-            
-        }
-
-        private void InitPlugins()
-        {
-            foreach (var plugin in Repository.GetInitPlugins())
-            {
-                plugin.Init();
-            }
-        }
-
-        private void ShutdownPlugins()
-        {
-            foreach (var plugin in Repository.GetShutdownPlugins())
-            {
-                plugin.Shutdown();
-            }
-        }
-
-        public static void LogError(string error)
-        {
+            manager.Shutdown();
         }
 
 
@@ -89,15 +71,14 @@ namespace CollectdClient
             string path = System.IO.Path.Combine(baseDir, "config.json");
             var config = JObject.Parse(System.IO.File.ReadAllText(path));
 
-            var collectd = new Collectd(config);
+            
 
             var container = new CompositionContainer(catalog);
-            container.ComposeParts(collectd);
-
+            var repository = container.GetExportedValue<IPluginRepository>();
+            var collectd = new Collectd(config, repository);
+            
             collectd.Init();
-            collectd.InitPlugins();
             collectd.RunLoops();
-            collectd.ShutdownPlugins();
             collectd.Shutdown();
         }
 

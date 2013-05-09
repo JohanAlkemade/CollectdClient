@@ -46,9 +46,21 @@ namespace CollectdClient.Plugins
             for (int i = 0; i < vl.Length; i++)
             {
                 await WriteSingle(vl[i]);
-            } 
+            }
 
+            //Write gets called every x seconds
+            //to make sure data arrives as soon as possible, we flush the writer
+            await Flush();
             return true;
+        }
+
+        private async Task Flush()
+        {
+            if (writer.Size > 0)
+            {
+                await client.SendAsync(writer.Bytes, writer.Size, host, port);
+                writer.Reset();
+            }
         }
 
         private async Task WriteSingle(ValueList vl)

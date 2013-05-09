@@ -9,52 +9,64 @@ namespace CollectdClient.Core
     [Export(typeof(IPluginRepository))]
     public class ComposablePluginRepository : IPluginRepository
     {
-        private readonly IDictionary<string, PluginInstance> plugins;
+        private readonly IList<PluginInstance> instances;
 
         [ImportingConstructor]
         public ComposablePluginRepository([ImportMany]IEnumerable<Lazy<IPlugin, IPluginMetadata>> plugins)
         {
-            this.plugins = plugins.ToDictionary(x => x.Metadata.Name, x => new PluginInstance()
+            this.instances = plugins.Select(x => new PluginInstance
             {
                 Enabled = false,
                 Plugin = x.Value,
                 Metadata = x.Metadata
-            });
+            }).ToList();
         }
 
         public bool Exists(string pluginName)
         {
-            return plugins.ContainsKey(pluginName);
+            return GetPlugin(pluginName) != null;
+        }
+        
+        public void EnablePlugin(IPlugin plugin)
+        {
+            EnablePlugin(plugin, true);
         }
 
-        public void EnablePlugin(string pluginName)
+        private void EnablePlugin(IPlugin plugin, bool enabled)
         {
-            if (!Exists(pluginName))
-                return;
+            var instance = instances.SingleOrDefault(x => x.Plugin == plugin);
+            if (instance != null)
+            {
+                instance.Enabled = enabled;
+            }
+        }
 
-            plugins[pluginName].Enabled = true;
+        public void DisablePlugin(IPlugin plugin)
+        {
+            EnablePlugin(plugin, false);
         }
 
         public IPlugin GetPlugin(string pluginName)
         {
-            return (from plugin in plugins
-                    where plugin.Key == pluginName && plugin.Value.Enabled
-                    select plugin.Value.Plugin).SingleOrDefault();
+            return (from instance in instances
+                    where instance.Metadata.Name == pluginName
+                    select instance.Plugin).SingleOrDefault();
         }
 
         public PluginInstance GetPluginInstance(IPlugin plugin)
         {
-            return plugins.Where(x => x.Value.Plugin == plugin).Select(x => x.Value).SingleOrDefault();
+            return instances.SingleOrDefault(x => x.Plugin == plugin);
         }
 
         public IEnumerable<IPlugin> GetCurrentPlugins()
         {
-            return plugins.Where(x => x.Value.Enabled).Select(x => x.Value.Plugin).ToArray();
+            return instances.Where(x => x.Enabled).Select(x => x.Plugin).ToArray();
         }
 
         public string GetPluginName(IPlugin plugin)
         {
-            return plugins.Where(x => x.Value.Plugin == plugin).Select(x => x.Key).SingleOrDefault();
+            var instance = GetPluginInstance(plugin);
+            return instance == null ? "" : instance.Metadata.Name;
         }
     }
 }

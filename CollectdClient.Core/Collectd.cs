@@ -4,16 +4,16 @@ namespace CollectdClient.Core
 {
     public class Collectd
     {
-        public static CollectdPipeline Pipeline { get; set; }
+        public static Pipeline Pipeline { get; set; }
 
         static Collectd()
         {
-            Pipeline = new CollectdPipeline();
+            Pipeline = new Pipeline();
         }
 
         public static void DispatchValues(ValueList vl)
         {
-            Pipeline.Post(vl);
+            Pipeline.Process(vl);
         }
     }
 }

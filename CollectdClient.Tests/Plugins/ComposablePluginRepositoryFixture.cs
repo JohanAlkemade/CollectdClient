@@ -11,24 +11,39 @@ namespace CollectdClient.Tests.Plugins
     public class ComposablePluginRepositoryFixture
     {
         private IPluginRepository repository;
+        private Mock<IPlugin> plugin;
         
         [TestInitialize]
         public void Init()
         {
+            plugin = new Mock<IPlugin>();
             repository = new ComposablePluginRepository(new Lazy<IPlugin, IPluginMetadata>[]
             {
-                new Lazy<IPlugin, IPluginMetadata>(() => new Mock<IPlugin>().Object, new PluginAttribute("test"))
+                new Lazy<IPlugin, IPluginMetadata>(() => plugin.Object, new PluginAttribute("test"))
             });
         }
 
+        [TestMethod]
+        public void GetPlugin_Returns_Disabled_Plugins()
+        {
+            Assert.IsNotNull(repository.GetPlugin("test"));
+        }
+        
         [TestMethod]
         public void GetCurrentPlugins_Returns_Only_Enabled_Plugins()
         {
             Assert.AreEqual(0, repository.GetCurrentPlugins().Count());
 
-            repository.EnablePlugin("test");
+            var toEnable = repository.GetPlugin("test");
+            repository.EnablePlugin(toEnable);
 
             Assert.AreEqual(1, repository.GetCurrentPlugins().Count());
+        }
+
+        [TestMethod]
+        public void GetPluginName_Works()
+        {
+            Assert.AreEqual("test", repository.GetPluginName(plugin.Object));
         }
     }
 }
