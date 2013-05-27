@@ -17,9 +17,9 @@ namespace CollectdClient.Tests
             var plugins = new List<Lazy<IPlugin, IPluginMetadata>>();
             plugins.Add(new Lazy<IPlugin, IPluginMetadata>(() => new CpuPlugin(), new PluginAttribute("cpu")));
 
-            var repository = new ComposablePluginRepository(plugins);
+            var manager = new PluginManager(plugins);
 
-            var runner = new PluginRunner(repository);
+            var runner = new PluginRunner(manager);
 
             runner.Run();
         }

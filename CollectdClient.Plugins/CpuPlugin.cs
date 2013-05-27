@@ -8,7 +8,7 @@ using CollectdClient.Core.Plugins;
 namespace CollectdClient.Plugins
 {
     [Plugin("cpu")]
-    public class CpuPlugin : IReadInterface, IInitInterface, IShutdownInterface
+    public class CpuPlugin : Plugin, IReadInterface, IInitInterface, IShutdownInterface
     {
         private readonly IList<PerformanceCounter> counters = new List<PerformanceCounter>();
 
@@ -53,11 +53,7 @@ namespace CollectdClient.Plugins
                               .AddValue(counter.NextValue())
                               .Build();
             
-            Collectd.DispatchValues(vl);
-        }
-
-        public void Register(PluginContext context)
-        {
+            Host.DispatchValues(vl);
         }
 
         public Task<bool> Read()
@@ -69,6 +65,8 @@ namespace CollectdClient.Plugins
         {
             int numberOfProcessors = System.Environment.ProcessorCount;
 
+            Log.Debug("Using {0} number of processor(s)", numberOfProcessors);
+            
             //init counters
             for (int i = 0; i < numberOfProcessors; i++)
             {

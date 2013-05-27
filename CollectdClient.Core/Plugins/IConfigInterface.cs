@@ -4,6 +4,6 @@ namespace CollectdClient.Core.Plugins
 {
     public interface IConfigInterface : IPlugin
     {
-        void Config(JToken config);
+        void Config(IConfigProvider provider);
     }
 }

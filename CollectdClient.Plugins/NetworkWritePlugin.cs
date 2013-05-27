@@ -7,7 +7,7 @@ using Newtonsoft.Json.Linq;
 namespace CollectdClient.Plugins
 {
     [Plugin("network")]
-    public class NetworkWritePlugin : IWriteInterface, IConfigInterface
+    public class NetworkWritePlugin : Plugin, IWriteInterface, IConfigInterface
     {
         private CollectdPacketWriter writer = new CollectdPacketWriter();
         private UdpClient client;
@@ -20,13 +20,10 @@ namespace CollectdClient.Plugins
             client.Ttl = 64;
             client.DontFragment = true;
         }
-
-        public void Register(PluginContext context)
+        
+        public void Config(IConfigProvider provider)
         {
-        }
-
-        public void Config(JToken config)
-        {
+            var config = provider.GetPluginConfigPart("network");
             var server = config["server"].Value<string>();
             int idx = server.IndexOf(':');
             if (idx > 0)

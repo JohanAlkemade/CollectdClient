@@ -57,7 +57,7 @@
     <Compile Include="DataSetTests.cs" />
     <Compile Include="DataSourceTests.cs" />
     <Compile Include="PluginRunnerTests.cs" />
-    <Compile Include="Plugins\ComposablePluginRepositoryFixture.cs" />
+    <Compile Include="Plugins\PluginManagerFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

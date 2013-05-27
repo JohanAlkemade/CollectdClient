@@ -11,11 +11,11 @@ namespace CollectdClient.Core
 {
     public class PluginRunner
     {
-        private readonly IPluginRepository repository;
+        private readonly PluginManager manager;
 
-        public PluginRunner(IPluginRepository repository)
+        public PluginRunner(PluginManager manager)
         {
-            this.repository = repository;
+            this.manager = manager;
         }
 
         private CancellationTokenSource cts = new CancellationTokenSource();
@@ -25,9 +25,9 @@ namespace CollectdClient.Core
             var tasks = new List<Task>();
 
             var runners = new List<ReadInterfaceRunner>();
-            foreach (var plugin in repository.GetReadPlugins())
+            foreach (var plugin in manager.GetReadPlugins())
             {
-                var pluginInstance = repository.GetPluginInstance(plugin);
+                var pluginInstance = manager.GetPluginInstance(plugin);
                 var runner = new ReadInterfaceRunner(pluginInstance, cts.Token);
                 runners.Add(runner);
             }
@@ -63,7 +63,6 @@ namespace CollectdClient.Core
                     await plugin.Read();
                     sw.Stop();
                     
-                    Console.WriteLine(string.Format("running {0} on thread {1}", plugin, System.Threading.Thread.CurrentThread.ManagedThreadId));
                     var toSleep = interval - sw.ElapsedMilliseconds;
 
                     if (toSleep > 0)

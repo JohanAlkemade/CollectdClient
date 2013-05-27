@@ -28,7 +28,7 @@
 			"server" : "10.201.0.248"
 		},
         "interface" : {
-            "include": [],
+            "include": ["Realtek PCIe GBE Family Controller"],
 			"exclude" : []
         }
     }

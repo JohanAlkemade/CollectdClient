@@ -9,7 +9,7 @@ using System;
 namespace CollectdClient.Plugins
 {
     [Plugin("redis", 5)]
-    public class RedisPlugin : IReadInterface, IConfigInterface, IInitInterface
+    public class RedisPlugin : Plugin, IReadInterface, IConfigInterface, IInitInterface
     {
 
         private IDictionary<string, RedisConnection> connections;
@@ -18,11 +18,7 @@ namespace CollectdClient.Plugins
         {
             connections = new Dictionary<string, RedisConnection>();
         }
-
-        public void Register(PluginContext context)
-        {
-        }
-
+        
         public void Init()
         {
             try
@@ -40,8 +36,9 @@ namespace CollectdClient.Plugins
             }
         }
 
-        public void Config(JToken config)
+        public void Config(IConfigProvider provider)
         {
+            var config = provider.GetPluginConfigPart("redis");
             foreach (var child in config.Children())
             {
                 string hostName = ((JProperty) child).Name;
@@ -78,7 +75,7 @@ namespace CollectdClient.Plugins
                               .AddValue(value)
                               .Build();
 
-            Collectd.DispatchValues(vl);
+            Host.DispatchValues(vl);
             
         }
     }

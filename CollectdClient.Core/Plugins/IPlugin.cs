@@ -5,6 +5,6 @@ namespace CollectdClient.Core.Plugins
 {    
     public interface IPlugin
     {
-        void Register(PluginContext context);
+        bool Register(IPluginHost host);
     }
 }

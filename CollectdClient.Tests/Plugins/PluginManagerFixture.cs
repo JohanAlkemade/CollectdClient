@@ -8,16 +8,16 @@ using Moq;
 namespace CollectdClient.Tests.Plugins
 {
     [TestClass]
-    public class ComposablePluginRepositoryFixture
+    public class PluginManagerFixture
     {
-        private IPluginRepository repository;
+        private PluginManager manager;
         private Mock<IPlugin> plugin;
         
         [TestInitialize]
         public void Init()
         {
             plugin = new Mock<IPlugin>();
-            repository = new ComposablePluginRepository(new Lazy<IPlugin, IPluginMetadata>[]
+            manager = new PluginManager(new Lazy<IPlugin, IPluginMetadata>[]
             {
                 new Lazy<IPlugin, IPluginMetadata>(() => plugin.Object, new PluginAttribute("test"))
             });
@@ -26,24 +26,24 @@ namespace CollectdClient.Tests.Plugins
         [TestMethod]
         public void GetPlugin_Returns_Disabled_Plugins()
         {
-            Assert.IsNotNull(repository.GetPlugin("test"));
+            Assert.IsNotNull(manager.GetPlugin("test"));
         }
         
         [TestMethod]
         public void GetCurrentPlugins_Returns_Only_Enabled_Plugins()
         {
-            Assert.AreEqual(0, repository.GetCurrentPlugins().Count());
+            Assert.AreEqual(0, manager.GetCurrentPlugins().Count());
 
-            var toEnable = repository.GetPlugin("test");
-            repository.EnablePlugin(toEnable);
+            var toEnable = manager.GetPlugin("test");
+            manager.EnablePlugin(toEnable);
 
-            Assert.AreEqual(1, repository.GetCurrentPlugins().Count());
+            Assert.AreEqual(1, manager.GetCurrentPlugins().Count());
         }
 
         [TestMethod]
         public void GetPluginName_Works()
         {
-            Assert.AreEqual("test", repository.GetPluginName(plugin.Object));
+            Assert.AreEqual("test", manager.GetPluginName(plugin.Object));
         }
     }
 }
